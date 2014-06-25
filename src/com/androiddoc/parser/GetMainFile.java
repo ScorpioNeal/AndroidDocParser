@@ -1,5 +1,6 @@
 package com.androiddoc.parser;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.jsoup.Jsoup;
@@ -16,24 +17,62 @@ import org.jsoup.select.Elements;
  */
 public class GetMainFile {
 
-	private static final String BASEURL = "http://developer.android.com";
+    private static final String BASEURL = "http://developer.android.com";
 
-	public static void main(String[] args) {
-		try {
-			Document doc = Jsoup.connect(
-					"http://developer.android.com/design/index.html").get();
-			Elements mElements = doc
-					.select("ul#nav>li.nav-section");
-			for(Element mElement : mElements){
-				Element parentElement = mElement.select("div").first();
-				Elements childElements = mElement.select("ul>li");
-				System.out.println(parentElement.text() +" (" + parentElement.child(0).attr("href") + ")");
-				for(Element childElement : childElements){
-					System.out.println("\t" + childElement.text() + "  " + childElement.child(0).attr("href"));
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    public static void main(String[] args) {
+        try {
+            Document doc = Jsoup.connect(
+                    "http://developer.android.com/design/index.html").get();
+            Elements mElements = doc.select("ul#nav>li.nav-section");
+            for (Element mElement : mElements) {
+                Element parentElement = mElement.select("div").first();
+                Elements childElements = mElement.select("ul>li");
+                System.out.println(parentElement.text() + " ("
+                        + parentElement.child(0).attr("href") + ")");
+                for (Element childElement : childElements) {
+                    System.out.println("\t" + childElement.text() + "  "
+                            + childElement.child(0).attr("href"));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getTraining() {
+        try {
+            Document document = Jsoup.parse(new File("doc.html"), "UTF-8");
+            Elements elements = document.select("ul#nav>li.nav-section");
+            for (int i = 0; i < elements.size(); i++) {
+                Elements firstElements = elements.get(i).select(
+                        "div.nav-section-header>a");
+                System.out.println("第一级名称: " + firstElements.get(0).text());
+                System.out.println("第一级URL : "
+                        + firstElements.get(0).attr("href"));
+
+                Elements secondElements = elements.get(i).select(
+                        "ul>li.nav-section");
+                for (int j = 0; j < secondElements.size(); j++) {
+                    Elements secondElementsParent = secondElements.get(j)
+                            .select("div>a");
+                    System.out.println("\t第二级名称: "
+                            + secondElementsParent.get(0).text());
+                    System.out.println("\t第二级URL : "
+                            + secondElementsParent.get(0).attr("href"));
+
+                    Elements thirdElements = secondElements.get(j).select(
+                            "ul>li>a");
+                    for (int k = 0; k < thirdElements.size(); k++) {
+                        Element thirdElement = thirdElements.get(k);
+                        System.out.println("\t\t第三级名称: " + thirdElement.text());
+                        System.out.println("\t\t第三级URL : "
+                                + thirdElement.attr("href"));
+                    }
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
